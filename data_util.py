@@ -15,9 +15,8 @@ def read_image(datalist):
     imgdata = []
     for imgname in datalist[:1024]:
         img = load_img(imgname,target_size = (64,64))
-        imgarray = img_to_array(img).astype(np.float32)
-        imgarray -= np.mean(imgarray)
-        imgarray /= 128.0
+        imgarray = img_to_array(img)/ 255
+        imgarray = imgarray * 2 - 1
         imgdata.append(np.reshape(imgarray,(1,)+imgarray.shape))
 
     return np.vstack(imgdata)
