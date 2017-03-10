@@ -18,10 +18,10 @@ class DCGan():
         self.dis_params()
         self.gen_param = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='generator')
         self.build()
-	print 'model built'
+        print 'model built'
 
     def fit(self, epochs,data, plot = True):
-	print 'start fitting'
+	    print 'start fitting'
         epoch = 0
         gan_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
         gen_label = np.zeros(self.batch_size)
@@ -40,9 +40,10 @@ class DCGan():
     def train(self,sampledata,gan_label,gen_label):
         for i in range(self.k):
             z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-	    self.opt_gan.run(feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
+	        self.opt_gan.run(feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
+            print i
 
-	z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
+	    z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
         self.opt_gen.run(feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,64,64,3)) , self.label : gen_label})
 
     def gen_params(self):
