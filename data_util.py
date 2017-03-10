@@ -38,7 +38,7 @@ def mnist_read(digit):
     #     test_label[i] = telabel[i]
 
     train_image = np.hstack((np.ones((trsize,1)),train_img))/255.0
-    train_image = np.reshape(train_image.shape + (1,)) * 2 - 1
+    train_image = np.reshape(train_image, train_image.shape + (1,)) * 2 - 1
 
     return train_image[train_label == digit]
 
