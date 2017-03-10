@@ -1,4 +1,9 @@
 import tensorflow as tf
+import numpy as np
+import matplotlib
+from PIL import Image
+# matplotlib.use('Agg')
+# from matplotlib impor pyplot as plt
 
 class DCGan():
     def __init__(self, sess, z_dim = 100, k=5, init_std = 0.2, eps = 1e-7,batch_size = 128,lr = 0.002):
@@ -11,65 +16,81 @@ class DCGan():
         self.std = init_std
         self.gen_params()
         self.dis_params()
-        self.model()
+        self.gen_param = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='generator')
         self.build()
 
-    def build(self):
-        self.optimizer = tf.train.AdamOptimizer(self.lr)
-        self.sess.run(tf.global_variables_initializer())
 
-    def train(self):
+    def fit(self, epochs,data, plot = True):
+        epoch = 0
+        gan_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
+        gen_label = np.zeros(self.batch_size)
+        while epoch < epochs:
+            ind = np.random.permutation(data.shape[0])
+            for i in range(data.shape[0]/self.batch_size):
+                self.train(data[i * self.batch_size: (i+1) * self.batch],gan_label,gen_label)
+            epoch += 1
+            print epoch
+            if plot and epoch % 5 == 0:
+                self.dconv4.eval(feed_dict = {self.ginput = np.random.randn(3,self.z_dim)})
+                for i in range(3):
+                    img = Image.fromarray(data, 'RGB')
+                    img.save('image/'+str(epoch)+'_'+str(i)+'.png')
+
+    def train(self,sampledata):
         for i in range(self.k):
-            self.label = tf.concat([tf.ones([self.batch_size]),tf.zeros([self.batch_size])],0)
-            self.loss = tf.nn.sigmoid_cross_entropy_with_logits(self.fcd, self.label)
+            self.opt_gan.run(feed_dict ={self.sampledata = sampledata, self.label = gan_label})
 
-            self.sess.run()
+        self.opt_gen.run(feed_dict ={self.sampledata = sampledata, self.label = gen_label})
 
     def gen_params(self):
-        self.fcg_w = tf.get_variable('fcg_w',[self.z_dim,1024*4*4],
-                        initializer = tf.random_normal_initializer(0, self.std))
+        with tf.variable_scope('generator') as scope:
 
-        self.fcg_b = tf.get_variable('fcg_b',[1024*4*4],initializer = tf.constant_initializer(0.0))
+            self.fcg_w = tf.get_variable('fcg_w',[self.z_dim,1024*4*4],
+                            initializer = tf.random_normal_initializer(0, self.std))
 
-        self.dconv1_w = tf.get_variable('dconv1_w',[5,5,512,1024],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.dconv1_b = tf.get_variable('dconv1_b',[512],initializer = tf.constant_initializer(0.0))
+            self.fcg_b = tf.get_variable('fcg_b',[1024*4*4],initializer = tf.constant_initializer(0.0))
 
-        self.dconv2_w = tf.get_variable('dconv2_w',[5,5,256,512],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.dconv2_b = tf.get_variable('dconv2_b',[256],initializer = tf.constant_initializer(0.0))
+            self.dconv1_w = tf.get_variable('dconv1_w',[5,5,512,1024],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.dconv1_b = tf.get_variable('dconv1_b',[512],initializer = tf.constant_initializer(0.0))
 
-        self.dconv3_w = tf.get_variable('dconv3_w',[5,5,128,256],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.dconv3_b = tf.get_variable('dconv3_b',[128],initializer = tf.constant_initializer(0.0))
+            self.dconv2_w = tf.get_variable('dconv2_w',[5,5,256,512],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.dconv2_b = tf.get_variable('dconv2_b',[256],initializer = tf.constant_initializer(0.0))
 
-        self.dconv4_w = tf.get_variable('dconv4_w',[5,5,3,128],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.dconv4_b = tf.get_variable('dconv4_b',[3],initializer = tf.constant_initializer(0.0))
+            self.dconv3_w = tf.get_variable('dconv3_w',[5,5,128,256],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.dconv3_b = tf.get_variable('dconv3_b',[128],initializer = tf.constant_initializer(0.0))
+
+            self.dconv4_w = tf.get_variable('dconv4_w',[5,5,3,128],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.dconv4_b = tf.get_variable('dconv4_b',[3],initializer = tf.constant_initializer(0.0))
 
     def dis_params(self):
-        self.conv1_w = tf.get_variable('conv1_w',[5,5,3,64],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.conv1_b = tf.get_variable('conv1_b',[64],initializer = tf.constant_initializer(0.0))
+        with tf.variable_scope('discriminator') as scope:
+            self.conv1_w = tf.get_variable('conv1_w',[5,5,3,64],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.conv1_b = tf.get_variable('conv1_b',[64],initializer = tf.constant_initializer(0.0))
 
-        self.conv2_w = tf.get_variable('conv2_w',[5,5,64,128],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.conv2_b = tf.get_variable('conv2_b',[128],initializer = tf.constant_initializer(0.0))
+            self.conv2_w = tf.get_variable('conv2_w',[5,5,64,128],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.conv2_b = tf.get_variable('conv2_b',[128],initializer = tf.constant_initializer(0.0))
 
-        self.conv3_w = tf.get_variable('conv3_w',[5,5,128,256],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.conv3_b = tf.get_variable('conv3_b',[256],initializer = tf.constant_initializer(0.0))
+            self.conv3_w = tf.get_variable('conv3_w',[5,5,128,256],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.conv3_b = tf.get_variable('conv3_b',[256],initializer = tf.constant_initializer(0.0))
 
-        self.conv4_w = tf.get_variable('conv4_w',[5,5,256,512],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.conv4_b = tf.get_variable('conv4_b',[512],initializer = tf.constant_initializer(0.0))
+            self.conv4_w = tf.get_variable('conv4_w',[5,5,256,512],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.conv4_b = tf.get_variable('conv4_b',[512],initializer = tf.constant_initializer(0.0))
 
-        self.fcd_w = tf.get_variable('fcd_w',[64*64*512,1],
-                        initializer = tf.random_normal_initializer(0, self.std))
-        self.fcd_b = tf.get_variable('fcd_b',[1],initializer = tf.constant_initializer(0.0))
+            self.fcd_w = tf.get_variable('fcd_w',[64*64*512,1],
+                            initializer = tf.random_normal_initializer(0, self.std))
+            self.fcd_b = tf.get_variable('fcd_b',[1],initializer = tf.constant_initializer(0.0))
 
 
-    def model(self):
+    def build(self):
+
         self.ginput = tf.placeholder(tf.float32, shape=(None,self.z_dim))
 
         with tf.variable_scope('gen_fc') as scope:
@@ -143,9 +164,15 @@ class DCGan():
             self.fcd_in = tf.reshape(self.conv4b, [-1,64*64*512])
             self.fcd = tf.matmul(self.fcd_in, self.fcd_w)+ self.fcd_b
 
-with tf.Session() as sess:
-    dcgan = DCGan(sess)
-    for variable in tf.global_variables():
-        print variable.name
+        self.label = tf.placeholder(tf.float32, shape = (None))
+        self.loss = tf.nn.sigmoid_cross_entropy_with_logits(logits = self.fcd, labels = self.label)
+
+        self.optimizer = tf.train.AdamOptimizer(self.lr)
+        self.opt_gan = self.optimizer.minimize(self.loss)
+        self.opt_gen = self.optimizer.minimize(self.loss, var_list = self.gen_param)
+        self.sess.run(tf.global_variables_initializer())
+
+# with tf.Session() as sess:
+    # dcgan = DCGan(sess)
     # train_writer = tf.summary.FileWriter('./train',
                                         #   sess.graph)
