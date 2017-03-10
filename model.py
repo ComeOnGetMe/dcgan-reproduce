@@ -6,7 +6,7 @@ from PIL import Image
 # from matplotlib impor pyplot as plt
 
 class DCGan():
-    def __init__(self, sess, z_dim = 100, k=5, init_std = 0.2, eps = 1e-7,batch_size = 128,lr = 0.002):
+    def __init__(self, sess, z_dim = 100,  k=5, init_std = 0.2, eps = 1e-7,batch_size = 128,lr = 0.002):
         self.z_dim = z_dim
         self.k = k
         self.lr = lr
@@ -14,6 +14,7 @@ class DCGan():
         self.eps = eps
         self.sess = sess
         self.std = init_std
+        self.image_size = (28,28,1)
         self.gen_params()
         self.dis_params()
         self.gen_param = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='generator')
@@ -36,7 +37,7 @@ class DCGan():
             if plot and epoch % 5 == 0:
                 gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
                 for i in range(5):
-                    img = Image.fromarray(((gimage[i]+1) / 2 * 255).astype(np.uint8), 'RGB')
+                    img = Image.fromarray(((gimage[i]+1) / 2 * 255).astype(np.uint8), 'L')
                     img.save('image/'+str(epoch)+'_'+str(i)+'.png')
 
     def train(self,sampledata,gan_label,gen_label):
@@ -45,7 +46,7 @@ class DCGan():
             self.opt_dis.run(feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
 
         z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-        self.opt_gen.run(feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,64,64,3)) , self.label : gen_label})
+        self.opt_gen.run(feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,) + self.image_size) , self.label : gen_label})
 
     def gen_params(self):
         with tf.variable_scope('generator') as scope:
@@ -67,13 +68,13 @@ class DCGan():
                             initializer = tf.random_normal_initializer(0, self.std))
             self.dconv3_b = tf.get_variable('dconv3_b',[128],initializer = tf.constant_initializer(0.0))
 
-            self.dconv4_w = tf.get_variable('dconv4_w',[5,5,3,128],
+            self.dconv4_w = tf.get_variable('dconv4_w',[5,5,self.image_size[-1],128],
                             initializer = tf.random_normal_initializer(0, self.std))
-            self.dconv4_b = tf.get_variable('dconv4_b',[3],initializer = tf.constant_initializer(0.0))
+            self.dconv4_b = tf.get_variable('dconv4_b',[self.image_size[-1]],initializer = tf.constant_initializer(0.0))
 
     def dis_params(self):
         with tf.variable_scope('discriminator') as scope:
-            self.conv1_w = tf.get_variable('conv1_w',[5,5,3,64],
+            self.conv1_w = tf.get_variable('conv1_w',[5,5,self.image_size[-1],64],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.conv1_b = tf.get_variable('conv1_b',[64],initializer = tf.constant_initializer(0.0))
 
@@ -133,11 +134,11 @@ class DCGan():
         with tf.variable_scope('gen_dconv4') as scope:
             self.dconv4 = tf.nn.tanh(tf.nn.conv2d_transpose(self.dconv3b,
                                                               self.dconv4_w,
-                                                              [self.batch_size, 64, 64, 3],
+                                                              (self.batch_size,) + self.image_size,
                                                               [1,2,2,1]) + self.dconv4_b)
 
 
-        self.sampledata = tf.placeholder(tf.float32, shape = (None,64,64,3))
+        self.sampledata = tf.placeholder(tf.float32, shape = (None,)+ self.image_size)
 
         self.dinput = tf.concat([self.sampledata,self.dconv4], 0)
 
