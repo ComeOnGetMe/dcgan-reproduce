@@ -38,9 +38,9 @@ class DCGan():
 
     def train(self,sampledata):
         for i in range(self.k):
-            self.opt_gan.run(feed_dict ={self.sampledata = sampledata, self.label = gan_label})
+            self.opt_gan.run(feed_dict ={self.sampledata : sampledata, self.label : gan_label})
 
-        self.opt_gen.run(feed_dict ={self.sampledata = sampledata, self.label = gen_label})
+        self.opt_gen.run(feed_dict ={self.sampledata : sampledata, self.label : gen_label})
 
     def gen_params(self):
         with tf.variable_scope('generator') as scope:
