@@ -32,16 +32,16 @@ class DCGan():
             epoch += 1
             print epoch
             if plot and epoch % 5 == 0:
-                self.dconv4.eval(feed_dict = {self.ginput : np.random.randn(3,self.z_dim)})
-                for i in range(3):
-                    img = Image.fromarray(data, 'RGB')
+                gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.randn(self.batch_size,self.z_dim)})
+                for i in range(5):
+                    img = Image.fromarray(gimage, 'RGB')
                     img.save('image/'+str(epoch)+'_'+str(i)+'.png')
 
     def train(self,sampledata,gan_label,gen_label):
         for i in range(self.k):
             z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
 	    self.opt_gan.run(feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
-        
+
 	z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
         self.opt_gen.run(feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,64,64,3)) , self.label : gen_label})
 
@@ -106,7 +106,7 @@ class DCGan():
         with tf.variable_scope('gen_dconv1') as scope:
             self.dconv1 = tf.nn.relu(tf.nn.conv2d_transpose(self.fcgb,
                                                               self.dconv1_w,
-                                                              [None,8,8,512],
+                                                              [self.batch_size,8,8,512],
                                                               [1,1,1,1],
                                                               padding = 'VALID') + self.dconv1_b)
             self.dconv1m, self.dconv1v = tf.nn.moments(self.dconv1, [0])
@@ -115,7 +115,7 @@ class DCGan():
         with tf.variable_scope('gen_dconv2') as scope:
             self.dconv2 = tf.nn.relu(tf.nn.conv2d_transpose(self.dconv1b,
                                                               self.dconv2_w,
-                                                              [-1, 16, 16, 256],
+                                                              [self.batch_size, 16, 16, 256],
                                                               [1,2,2,1]) + self.dconv2_b)
             self.dconv2m, self.dconv2v = tf.nn.moments(self.dconv2, [0])
             self.dconv2b = tf.nn.batch_normalization(self.dconv2, self.dconv2m, self.dconv2v ,None,None,self.eps)
@@ -123,7 +123,7 @@ class DCGan():
         with tf.variable_scope('gen_dconv3') as scope:
             self.dconv3 = tf.nn.relu(tf.nn.conv2d_transpose(self.dconv2b,
                                                               self.dconv3_w,
-                                                              [-1, 32, 32, 128],
+                                                              [self.batch_size, 32, 32, 128],
                                                               [1,2,2,1]) + self.dconv3_b)
             self.dconv3m, self.dconv3v = tf.nn.moments(self.dconv3, [0])
             self.dconv3b = tf.nn.batch_normalization(self.dconv3, self.dconv3m, self.dconv3v ,None,None,self.eps)
@@ -131,7 +131,7 @@ class DCGan():
         with tf.variable_scope('gen_dconv4') as scope:
             self.dconv4 = tf.nn.tanh(tf.nn.conv2d_transpose(self.dconv3b,
                                                               self.dconv4_w,
-                                                              [-1, 64, 64, 3],
+                                                              [self.batch_size, 64, 64, 3],
                                                               [1,2,2,1]) + self.dconv4_b)
 
 
