@@ -22,16 +22,17 @@ class DCGan():
         print 'model built'
 
     def fit(self, epochs,data, plot = True):
-	    print 'start fitting'
+        print 'start fitting'
         epoch = 0
         gan_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
         gen_label = np.zeros(self.batch_size)
         while epoch < epochs:
             ind = np.random.permutation(data.shape[0])[20 * self.batch_size]
             for i in range(20):
+                print 'batch:', i
                 self.train(data[i * self.batch_size: (i+1) * self.batch_size],gan_label,gen_label)
             epoch += 1
-            print epoch
+            print 'epoch:',epoch
             if plot and epoch % 5 == 0:
                 gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
                 for i in range(5):
@@ -41,10 +42,9 @@ class DCGan():
     def train(self,sampledata,gan_label,gen_label):
         for i in range(self.k):
             z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-	        self.opt_dis.run(feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
-            print i
+            self.opt_dis.run(feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
 
-	    z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
+        z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
         self.opt_gen.run(feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,64,64,3)) , self.label : gen_label})
 
     def gen_params(self):
@@ -173,8 +173,8 @@ class DCGan():
         self.loss = tf.nn.sigmoid_cross_entropy_with_logits(logits = self.fcd, labels = self.label)
 
         self.optimizer = tf.train.AdamOptimizer(self.lr)
-        self.opt_dis = self.optimizer.minimize(-self.loss, var_list = self.gen_param)
-        self.opt_gen = self.optimizer.minimize(self.loss, var_list = self.gen_param)
+        self.opt_dis = self.optimizer.minimize(self.loss, var_list = self.gen_param)
+        self.opt_gen = self.optimizer.minimize(-self.loss, var_list = self.gen_param)
         self.sess.run(tf.global_variables_initializer())
 
 # with tf.Session() as sess:

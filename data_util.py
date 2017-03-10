@@ -13,7 +13,7 @@ def data_list(base):
 
 def read_image(datalist):
     imgdata = []
-    for imgname in datalist[:1024]:
+    for imgname in datalist[:4096]:
         img = load_img(imgname,target_size = (64,64))
         imgarray = img_to_array(img)/ 255
         imgarray = imgarray * 2 - 1

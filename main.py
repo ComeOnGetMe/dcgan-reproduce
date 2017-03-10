@@ -6,5 +6,5 @@ data = read_image(data_list('../lsun/images/classroom'))
 print data.shape
 
 with tf.Session() as sess:
-    dcgan = DCGan(sess)
-    dcgan.fit(10,data)
+    dcgan = DCGan(sess,batch_size = 32)
+    dcgan.fit(50,data)
