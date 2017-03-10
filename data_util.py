@@ -6,7 +6,7 @@ from keras.preprocessing.image import load_img
 def data_list(base):
     subfolders = glob.glob(base)
     train_data = []
-    for subfolder in subfolders[: -1]:
+    subfolder = subfolders[3]
     images = np.array(glob.glob(os.path.join(subfolder,'*.jpg')))
     train_data.append(images.tolist())
     return train_data
