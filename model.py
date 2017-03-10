@@ -31,7 +31,7 @@ class DCGan():
             epoch += 1
             print epoch
             if plot and epoch % 5 == 0:
-                self.dconv4.eval(feed_dict = {self.ginput = np.random.randn(3,self.z_dim)})
+                self.dconv4.eval(feed_dict = {self.ginput : np.random.randn(3,self.z_dim)})
                 for i in range(3):
                     img = Image.fromarray(data, 'RGB')
                     img.save('image/'+str(epoch)+'_'+str(i)+'.png')
