@@ -1,25 +1,23 @@
 import os
 import glob
 import numpy as np
-from keras.preprocessing.image import load_img
+from keras.preprocessing.image import load_img,img_to_array
 
 def data_list(base):
     subfolders = glob.glob(base)
     train_data = []
-    subfolder in subfolders[: -1]:
-    images = np.array(glob.glob(os.path.join(subfolder,'*.jpg')))
+    subfolder = subfolders[0]
+    print subfolder
+    images = np.array(glob.glob(os.path.join(subfolder,'*.webp')))
     return images
 
-def read_image(datalist,num):
-    ind = np.random.permutation(datalist.shape[0])[:num]
+def read_image(datalist):
     imgdata = []
-    i = 0
-    while i < num:
-        img = load_img(datalist[ind[i]],target_size = (64,64))
-        imgarray = np.copy(np.asarray(img))
+    for imgname in datalist[:1024]:
+        img = load_img(imgname,target_size = (64,64))
+        imgarray = img_to_array(img).astype(np.float32)
         imgarray -= np.mean(imgarray)
         imgarray /= 128.0
-        imgarray.reshape((1,)+imgarray.shape)
-        imgdata.append(imgarray)
+        imgdata.append(np.reshape(imgarray,(1,)+imgarray.shape))
 
     return np.vstack(imgdata)

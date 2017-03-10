@@ -2,9 +2,9 @@ from model import *
 import tensorflow as tf
 from data_util import *
 
-
+data = read_image(data_list('../lsun/images/classroom'))
+print data.shape
 
 with tf.Session() as sess:
-    data = read_image(data_list('../256_ObjectCategories'),25600)
     dcgan = DCGan(sess)
     dcgan.fit(10,data)

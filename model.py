@@ -18,16 +18,17 @@ class DCGan():
         self.dis_params()
         self.gen_param = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='generator')
         self.build()
-
+	print 'model built'
 
     def fit(self, epochs,data, plot = True):
+	print 'start fitting'
         epoch = 0
         gan_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
         gen_label = np.zeros(self.batch_size)
         while epoch < epochs:
             ind = np.random.permutation(data.shape[0])
             for i in range(data.shape[0]/self.batch_size):
-                self.train(data[i * self.batch_size: (i+1) * self.batch],gan_label,gen_label)
+                self.train(data[i * self.batch_size: (i+1) * self.batch_size],gan_label,gen_label)
             epoch += 1
             print epoch
             if plot and epoch % 5 == 0:
@@ -36,11 +37,13 @@ class DCGan():
                     img = Image.fromarray(data, 'RGB')
                     img.save('image/'+str(epoch)+'_'+str(i)+'.png')
 
-    def train(self,sampledata):
+    def train(self,sampledata,gan_label,gen_label):
         for i in range(self.k):
-            self.opt_gan.run(feed_dict ={self.sampledata : sampledata, self.label : gan_label})
-
-        self.opt_gen.run(feed_dict ={self.sampledata : sampledata, self.label : gen_label})
+            z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
+	    self.opt_gan.run(feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
+        
+	z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
+        self.opt_gen.run(feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,64,64,3)) , self.label : gen_label})
 
     def gen_params(self):
         with tf.variable_scope('generator') as scope:
@@ -103,7 +106,7 @@ class DCGan():
         with tf.variable_scope('gen_dconv1') as scope:
             self.dconv1 = tf.nn.relu(tf.nn.conv2d_transpose(self.fcgb,
                                                               self.dconv1_w,
-                                                              [-1,8,8,512],
+                                                              [None,8,8,512],
                                                               [1,1,1,1],
                                                               padding = 'VALID') + self.dconv1_b)
             self.dconv1m, self.dconv1v = tf.nn.moments(self.dconv1, [0])
