@@ -84,7 +84,7 @@ class DCGan():
                             initializer = tf.random_normal_initializer(0, self.std))
             self.conv4_b = tf.get_variable('conv4_b',[512],initializer = tf.constant_initializer(0.0))
 
-            self.fcd_w = tf.get_variable('fcd_w',[64*64*512,1],
+            self.fcd_w = tf.get_variable('fcd_w',[4*4*512,1],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.fcd_b = tf.get_variable('fcd_b',[1],initializer = tf.constant_initializer(0.0))
 
@@ -161,7 +161,7 @@ class DCGan():
             self.conv4b = tf.nn.batch_normalization(self.conv4r, self.conv4m, self.conv4v, None, None, self.eps)
 
         with tf.variable_scope('dis_fc') as scope:
-            self.fcd_in = tf.reshape(self.conv4b, [-1,64*64*512])
+            self.fcd_in = tf.reshape(self.conv4b, [-1,4*4*512])
             self.fcd = tf.matmul(self.fcd_in, self.fcd_w)+ self.fcd_b
 
         self.label = tf.placeholder(tf.float32, shape = (None))
