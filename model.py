@@ -33,7 +33,9 @@ class DCGan():
                 print 'batch:', i
                 for j in range(self.k):
                     z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-                    _, dis_loss = self.sess.run([self.opt_dis,self.loss], feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
+                    sampledata = data[ind* self.batch_size : (i+1)* self.batch_size]
+                    _, dis_loss = self.sess.run([self.opt_dis,self.loss],
+                    feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
 
                 z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
                 _, gen_loss = self.sess.run([self.opt_gen,self.loss], feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,) + self.image_size) , self.label : gen_label})
