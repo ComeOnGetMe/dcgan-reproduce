@@ -172,7 +172,7 @@ class DCGan():
             self.fcd = tf.matmul(self.fcd_in, self.fcd_w)+ self.fcd_b
 
         self.label = tf.placeholder(tf.float32, shape = (None))
-        self.loss = tf.nn.sigmoid_cross_entropy_with_logits(logits = self.fcd, labels = self.label)
+        self.loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = self.fcd, labels = self.label))
 
         self.optimizer = tf.train.AdamOptimizer(self.lr)
         self.opt_dis = self.optimizer.minimize(self.loss, var_list = self.dis_param)
