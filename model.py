@@ -58,26 +58,26 @@ class DCGan():
                             initializer = tf.random_normal_initializer(0, self.std))
 
             self.fcg_b = tf.get_variable('fcg_b',[1024*4*4],initializer = tf.constant_initializer(0.0))
-            self.fcg_sc = tf.get_variable('fcg_sc',[1],initializer = tf.constant_initializer(1.0))
-            self.fcg_sh = tf.get_variable('fcg_sh',[1],initializer = tf.constant_initializer(0.0))
+            self.fcg_sc = tf.constant([1.0])#tf.get_variable('fcg_sc',[1],initializer = tf.constant_initializer(1.0))
+            self.fcg_sh = tf.constant([0.0])#tf.get_variable('fcg_sh',[1],initializer = tf.constant_initializer(0.0))
 
             self.dconv1_w = tf.get_variable('dconv1_w',[5,5,512,1024],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.dconv1_b = tf.get_variable('dconv1_b',[512],initializer = tf.constant_initializer(0.0))
-            self.dconv1_sc = tf.get_variable('dconv1_sc',[1],initializer = tf.constant_initializer(1.0))
-            self.dconv1_sh = tf.get_variable('dconv1_sh',[1],initializer = tf.constant_initializer(0.0))
+            self.dconv1_sc = tf.constant([1.0])#tf.get_variable('dconv1_sc',[1],initializer = tf.constant_initializer(1.0))
+            self.dconv1_sh = tf.constant([0.0])#tf.get_variable('dconv1_sh',[1],initializer = tf.constant_initializer(0.0))
 
             self.dconv2_w = tf.get_variable('dconv2_w',[5,5,256,512],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.dconv2_b = tf.get_variable('dconv2_b',[256],initializer = tf.constant_initializer(0.0))
-            self.dconv2_sc = tf.get_variable('dconv2_sc',[1],initializer = tf.constant_initializer(1.0))
-            self.dconv2_sh = tf.get_variable('dconv2_sh',[1],initializer = tf.constant_initializer(0.0))
+            self.dconv2_sc = tf.constant([1.0])#tf.get_variable('dconv2_sc',[1],initializer = tf.constant_initializer(1.0))
+            self.dconv2_sh = tf.constant([0.0])#tf.get_variable('dconv2_sh',[1],initializer = tf.constant_initializer(0.0))
 
             self.dconv3_w = tf.get_variable('dconv3_w',[5,5,128,256],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.dconv3_b = tf.get_variable('dconv3_b',[128],initializer = tf.constant_initializer(0.0))
-            self.dconv3_sc = tf.get_variable('dconv3_sc',[1],initializer = tf.constant_initializer(1.0))
-            self.dconv3_sh = tf.get_variable('dconv3_sh',[1],initializer = tf.constant_initializer(0.0))
+            self.dconv3_sc = tf.constant([1.0])#tf.get_variable('dconv3_sc',[1],initializer = tf.constant_initializer(1.0))
+            self.dconv3_sh = tf.constant([0.0])#tf.get_variable('dconv3_sh',[1],initializer = tf.constant_initializer(0.0))
 
             self.dconv4_w = tf.get_variable('dconv4_w',[5,5,self.image_size[-1],128],
                             initializer = tf.random_normal_initializer(0, self.std))
@@ -88,26 +88,26 @@ class DCGan():
             self.conv1_w = tf.get_variable('conv1_w',[5,5,self.image_size[-1],64],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.conv1_b = tf.get_variable('conv1_b',[64],initializer = tf.constant_initializer(0.0))
-            self.conv1_sc = tf.get_variable('conv1_sc',[1],initializer = tf.constant_initializer(1.0))
-            self.conv1_sh = tf.get_variable('conv1_sh',[1],initializer = tf.constant_initializer(0.0))
+            self.conv1_sc = tf.constant([1.0])#tf.get_variable('conv1_sc',[1],initializer = tf.constant_initializer(1.0))
+            self.conv1_sh = tf.constant([0.0])#tf.get_variable('conv1_sh',[1],initializer = tf.constant_initializer(0.0))
 
             self.conv2_w = tf.get_variable('conv2_w',[5,5,64,128],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.conv2_b = tf.get_variable('conv2_b',[128],initializer = tf.constant_initializer(0.0))
-            self.conv2_sc = tf.get_variable('conv2_sc',[1],initializer = tf.constant_initializer(1.0))
-            self.conv2_sh = tf.get_variable('conv2_sh',[1],initializer = tf.constant_initializer(0.0))
+            self.conv2_sc = tf.constant([1.0])#tf.get_variable('conv2_sc',[1],initializer = tf.constant_initializer(1.0))
+            self.conv2_sh = tf.constant([0.0])#tf.get_variable('conv2_sh',[1],initializer = tf.constant_initializer(0.0))
 
             self.conv3_w = tf.get_variable('conv3_w',[5,5,128,256],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.conv3_b = tf.get_variable('conv3_b',[256],initializer = tf.constant_initializer(0.0))
-            self.conv3_sc = tf.get_variable('conv3_sc',[1],initializer = tf.constant_initializer(1.0))
-            self.conv3_sh = tf.get_variable('conv3_sh',[1],initializer = tf.constant_initializer(0.0))
+            self.conv3_sc = tf.constant([1.0])#tf.get_variable('conv3_sc',[1],initializer = tf.constant_initializer(1.0))
+            self.conv3_sh = tf.constant([0.0])#tf.get_variable('conv3_sh',[1],initializer = tf.constant_initializer(0.0))
 
             self.conv4_w = tf.get_variable('conv4_w',[5,5,256,512],
                             initializer = tf.random_normal_initializer(0, self.std))
             self.conv4_b = tf.get_variable('conv4_b',[512],initializer = tf.constant_initializer(0.0))
-            self.conv4_sc = tf.get_variable('conv4_sc',[1],initializer = tf.constant_initializer(1.0))
-            self.conv4_sh = tf.get_variable('conv4_sh',[1],initializer = tf.constant_initializer(0.0))
+            self.conv4_sc = tf.constant([1.0])#tf.get_variable('conv4_sc',[1],initializer = tf.constant_initializer(1.0))
+            self.conv4_sh = tf.constant([0.0])#tf.get_variable('conv4_sh',[1],initializer = tf.constant_initializer(0.0))
 
             self.fcd_w = tf.get_variable('fcd_w',[4*4*512,1],
                             initializer = tf.random_normal_initializer(0, self.std))
