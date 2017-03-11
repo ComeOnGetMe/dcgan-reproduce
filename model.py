@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib
-from PIL import Image
+import scipy.misc
+# from PIL import Image
 
 class DCGan():
     def __init__(self, sess, z_dim = 100,  k=2, init_std = 0.2, eps = 1e-7,batch_size = 128,lr = 0.0002):
@@ -43,8 +44,7 @@ class DCGan():
                 if plot and i % 50 == 0:
                     gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
                     for im in range(5):
-                        img = Image.fromarray(((gimage[im]+1) / 2 * 255).astype(np.uint8), 'RGB')
-                        img.save('image/'+str(epoch)+'_'+str(i)+'_'+str(im)+ '.png')
+                        scipy.misc.imsave('image/'+str(epoch)+'_'+str(i)+'_'+str(im)+ '.png',(gimage[im]+1)/2)
             epoch += 1
             print 'epoch:',epoch
 
@@ -168,14 +168,14 @@ class DCGan():
             self.conv1r = 0.2 * self.conv1 + (1 - 0.2) * tf.nn.relu(self.conv1)
             self.conv1m, self.conv1v = tf.nn.moments(self.conv1r, [0])
             self.conv1b = tf.nn.batch_normalization(self.conv1r, self.conv1m, self.conv1v,
-                                                    self.conv1_sh,self.conv1_sc,, self.eps)
+                                                    self.conv1_sh,self.conv1_sc, self.eps)
 
         with tf.variable_scope('dis_conv2') as scope:
             self.conv2 = tf.nn.conv2d(self.conv1b, self.conv2_w, [1,2,2,1], 'SAME') + self.conv2_b
             self.conv2r = 0.2 * self.conv2 + (1 - 0.2) * tf.nn.relu(self.conv2)
             self.conv2m, self.conv2v = tf.nn.moments(self.conv2r, [0])
             self.conv2b = tf.nn.batch_normalization(self.conv2r, self.conv2m, self.conv2v,
-                                                    self.conv2_sh,self.conv2_sc,, self.eps)
+                                                    self.conv2_sh,self.conv2_sc,self.eps)
 
         with tf.variable_scope('dis_conv3') as scope:
             self.conv3 = tf.nn.conv2d(self.conv2b, self.conv3_w, [1,2,2,1], 'SAME') + self.conv3_b
