@@ -5,7 +5,7 @@ import scipy.misc
 # from PIL import Image
 
 class DCGan():
-    def __init__(self, sess, z_dim = 100,  k=5, init_std = 0.2, eps = 1e-4,batch_size = 128,lr = 0.0002):
+    def __init__(self, sess, z_dim = 100,  k=5, init_std = 0.02, eps = 1e-4,batch_size = 128,lr = 0.0002):
         self.z_dim = z_dim
         self.k = k
         self.lr = lr
