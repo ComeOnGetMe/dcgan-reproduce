@@ -24,11 +24,12 @@ class DCGan():
     def fit(self, epochs,data, plot = True):
         print 'start fitting'
         epoch = 0
+        batch_num = data.shape[0] / self.batch_size
         dis_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
         gen_label = np.ones(self.batch_size)
         while epoch < epochs:
-            ind = np.random.permutation(data.shape[0])[900 * self.batch_size]
-            for i in range(900):
+            ind = np.random.permutation(data.shape[0])
+            for i in range(batch_num):
                 for j in range(self.k):
                     z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
                     sampledata = data[i * self.batch_size : (i+1)* self.batch_size]
@@ -41,7 +42,7 @@ class DCGan():
                                 self.sampledata :np.zeros((0,) + self.image_size) ,
                                 self.label : gen_label})
                 print 'batch:',i,'discriminator loss:',dis_loss,'generator loss:', gen_loss
-                if plot and i % 50 == 0:
+                if plot and i % 500 == 0:
                     gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
                     for im in range(5):
                         scipy.misc.imsave('image/'+str(epoch)+'_'+str(i)+'_'+str(im)+ '.png',(gimage[im]+1)/2)
@@ -128,11 +129,10 @@ class DCGan():
             self.dconv1 = tf.nn.relu(tf.nn.conv2d_transpose(self.fcgb,
                                                               self.dconv1_w,
                                                               [self.batch_size,8,8,512],
-                                                              [1,1,1,1],
-                                                              padding = 'VALID') + self.dconv1_b)
+                                                              [1,2,2,1]) + self.dconv1_b)
             self.dconv1m, self.dconv1v = tf.nn.moments(self.dconv1, [0])
             self.dconv1b = tf.nn.batch_normalization(self.dconv1, self.dconv1m, self.dconv1v,
-                                                     self.dconv1_sh,self.dconv1_sc,elf.eps)
+                                                     self.dconv1_sh,self.dconv1_sc,self.eps)
 
         with tf.variable_scope('gen_dconv2') as scope:
             self.dconv2 = tf.nn.relu(tf.nn.conv2d_transpose(self.dconv1b,
@@ -198,7 +198,7 @@ class DCGan():
         self.label = tf.placeholder(tf.float32, shape = (None))
         self.loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits = self.fcd, labels = self.label))
 
-        self.optimizer = tf.train.AdamOptimizer(self.lr)
+        self.optimizer = tf.train.AdamOptimizer(self.lr,beta1 = 0.5)
         self.opt_dis = self.optimizer.minimize(self.loss, var_list = self.dis_param)
         self.opt_gen = self.optimizer.minimize(self.loss, var_list = self.gen_param)
         self.sess.run(tf.global_variables_initializer())

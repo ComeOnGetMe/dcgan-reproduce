@@ -7,5 +7,5 @@ data = read_image(data_list('../lsun/images/church'))
 print data.shape
 
 with tf.Session() as sess:
-    dcgan = DCGan(sess)
+    dcgan = DCGan(sess,batch_size = 64)
     dcgan.fit(50,data)
