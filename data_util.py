@@ -28,7 +28,7 @@ def mnist_read(digit):
     train_label = np.zeros((trsize), dtype=np.uint8)
     train_img = np.zeros((trsize, rows * cols), dtype=np.float)
     for i in range(trsize):
-        train_img[i] = np.array(trimg[i * rows * cols: (i + 1) * rows * cols])
+        train_img[i] = np.array(trimg[i * rows * cols: (i + 1) * rows * cols])/255.0
         train_label[i] = trlabel[i]
 
     # test_label = np.zeros((tesize), dtype=np.float)
@@ -37,8 +37,8 @@ def mnist_read(digit):
     #     test_img[i] = np.array(teimg[i * rows * cols: (i + 1) * rows * cols])
     #     test_label[i] = telabel[i]
 
-    train_image = np.hstack((np.ones((trsize,1)),train_img))/255.0
-    train_image = np.reshape(train_image, train_image.shape + (1,)) * 2 - 1
+    # train_image = np.hstack((np.ones((trsize,1)),train_img))/255.0
+    train_image = np.reshape(train_image, (-1,rows,cols,1)) * 2 - 1
 
     return train_image[train_label == digit]
 
