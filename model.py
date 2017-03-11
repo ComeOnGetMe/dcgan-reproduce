@@ -26,7 +26,7 @@ class DCGan():
         print 'start fitting'
         epoch = 0
         gan_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
-        gen_label = np.zeros(self.batch_size)
+        gen_label = np.ones(self.batch_size)
         while epoch < epochs:
             ind = np.random.permutation(data.shape[0])[20 * self.batch_size]
             for i in range(20):
@@ -47,7 +47,7 @@ class DCGan():
 
         z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
         _, gen_loss = self.sess.run([self.opt_gen,self.loss], feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,) + self.image_size) , self.label : gen_label})
-        print dis_loss, - gen_loss
+        print dis_loss, gen_loss
 
     def gen_params(self):
         with tf.variable_scope('generator') as scope:
@@ -176,7 +176,7 @@ class DCGan():
 
         self.optimizer = tf.train.AdamOptimizer(self.lr)
         self.opt_dis = self.optimizer.minimize(self.loss, var_list = self.dis_param)
-        self.opt_gen = self.optimizer.minimize(-self.loss, var_list = self.gen_param)
+        self.opt_gen = self.optimizer.minimize(self.loss, var_list = self.gen_param)
         self.sess.run(tf.global_variables_initializer())
 
 # with tf.Session() as sess:
