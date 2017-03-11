@@ -5,7 +5,7 @@ import scipy.misc
 # from PIL import Image
 
 class DCGan():
-    def __init__(self, sess, z_dim = 100,  k=2, init_std = 0.2, eps = 1e-7,batch_size = 128,lr = 0.0002):
+    def __init__(self, sess, z_dim = 100,  k=5, init_std = 0.2, eps = 1e-4,batch_size = 128,lr = 0.0002):
         self.z_dim = z_dim
         self.k = k
         self.lr = lr
@@ -42,7 +42,7 @@ class DCGan():
                                 self.sampledata :np.zeros((0,) + self.image_size) ,
                                 self.label : gen_label})
                 print 'batch:',i,'discriminator loss:',dis_loss,'generator loss:', gen_loss
-                if plot and i % 500 == 0:
+                if plot and i % 200 == 0:
                     gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
                     for im in range(5):
                         scipy.misc.imsave('image/'+str(epoch)+'_'+str(i)+'_'+str(im)+ '.png',(gimage[im]+1)/2)
