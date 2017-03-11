@@ -14,7 +14,7 @@ class DCGan():
         self.eps = eps
         self.sess = sess
         self.std = init_std
-        self.image_size = (28,28,1)
+        self.image_size = (64,64,3)
         self.gen_params()
         self.dis_params()
         self.gen_param = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='generator')
@@ -37,7 +37,7 @@ class DCGan():
             if plot and epoch % 5 == 0:
                 gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
                 for i in range(5):
-                    img = Image.fromarray(((gimage[i]+1) / 2 * 255).astype(np.uint8), 'L')
+                    img = Image.fromarray(((gimage[i]+1) / 2 * 255).astype(np.uint8), 'RGB')
                     img.save('image/'+str(epoch)+'_'+str(i)+'.png')
 
     def train(self,sampledata,gan_label,gen_label):
@@ -174,7 +174,7 @@ class DCGan():
         self.loss = tf.nn.sigmoid_cross_entropy_with_logits(logits = self.fcd, labels = self.label)
 
         self.optimizer = tf.train.AdamOptimizer(self.lr)
-        self.opt_dis = self.optimizer.minimize(self.loss, var_list = self.gen_param)
+        self.opt_dis = self.optimizer.minimize(self.loss, var_list = self.dis_param)
         self.opt_gen = self.optimizer.minimize(-self.loss, var_list = self.gen_param)
         self.sess.run(tf.global_variables_initializer())
 
