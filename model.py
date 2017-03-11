@@ -38,8 +38,8 @@ class DCGan():
 
                 z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
                 _, gen_loss = self.sess.run([self.opt_gen,self.loss],
-                    feed_dict ={self.ginput: z,/
-                                self.sampledata :np.zeros((0,) + self.image_size) ,/
+                    feed_dict ={self.ginput: z,
+                                self.sampledata :np.zeros((0,) + self.image_size) ,
                                 self.label : gen_label})
                 print 'batch:',i,'discriminator loss:',dis_loss,'generator loss:', gen_loss
                 if plot and i % 50 == 0:
