@@ -43,10 +43,10 @@ class DCGan():
     def train(self,sampledata,gan_label,gen_label):
         for i in range(self.k):
             z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-            dis_loss = self.opt_dis.run(self.dis_loss, feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
+            dis_loss = self.opt_dis.run(self.loss, feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
 
         z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-        gen_loss = self.opt_gen.run(self.gen_loss, feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,) + self.image_size) , self.label : gen_label})
+        gen_loss = self.opt_gen.run(self.loss, feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,) + self.image_size) , self.label : gen_label})
         print dis_loss, - gen_loss
 
     def gen_params(self):
