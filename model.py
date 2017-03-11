@@ -25,22 +25,24 @@ class DCGan():
     def fit(self, epochs,data, plot = True):
         print 'start fitting'
         epoch = 0
-        gan_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
+        dis_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
         gen_label = np.ones(self.batch_size)
         while epoch < epochs:
-            ind = np.random.permutation(data.shape[0])[500 * self.batch_size]
-            for i in range(500):
-                print 'batch:', i
+            ind = np.random.permutation(data.shape[0])[1000 * self.batch_size]
+            for i in range(1000):
                 for j in range(self.k):
                     z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-                    sampledata = data[ind* self.batch_size : (i+1)* self.batch_size]
+                    sampledata = data[i * self.batch_size : (i+1)* self.batch_size]
                     _, dis_loss = self.sess.run([self.opt_dis,self.loss],
-                    feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
+                    feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : dis_label})
 
                 z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-                _, gen_loss = self.sess.run([self.opt_gen,self.loss], feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,) + self.image_size) , self.label : gen_label})
-                print dis_loss, gen_loss
-                if plot and i % 20 == 0:
+                _, gen_loss = self.sess.run([self.opt_gen,self.loss],
+                    feed_dict ={self.ginput: z,/
+                                self.sampledata :np.zeros((0,) + self.image_size) ,/
+                                self.label : gen_label})
+                print 'batch:',i,'discriminator loss:',dis_loss,'generator loss:', gen_loss
+                if plot and i % 50 == 0:
                     gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
                     for im in range(5):
                         img = Image.fromarray(((gimage[im]+1) / 2 * 255).astype(np.uint8), 'RGB')
