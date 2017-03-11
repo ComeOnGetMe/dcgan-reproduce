@@ -2,7 +2,7 @@ from model import *
 import tensorflow as tf
 from data_util import *
 
-data = read_image(data_list('../lsun/images/classroom'))
+data = read_image(data_list('../lsun/images/church'))
 # data = mnist_read(3)
 print data.shape
 

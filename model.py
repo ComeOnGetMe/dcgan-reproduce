@@ -6,7 +6,7 @@ from PIL import Image
 # from matplotlib impor pyplot as plt
 
 class DCGan():
-    def __init__(self, sess, z_dim = 100,  k=5, init_std = 0.2, eps = 1e-7,batch_size = 128,lr = 0.002):
+    def __init__(self, sess, z_dim = 100,  k=2, init_std = 0.2, eps = 1e-7,batch_size = 128,lr = 0.002):
         self.z_dim = z_dim
         self.k = k
         self.lr = lr
@@ -28,26 +28,25 @@ class DCGan():
         gan_label = np.hstack([np.ones(self.batch_size),np.zeros(self.batch_size)])
         gen_label = np.ones(self.batch_size)
         while epoch < epochs:
-            ind = np.random.permutation(data.shape[0])[20 * self.batch_size]
-            for i in range(20):
+            ind = np.random.permutation(data.shape[0])[500 * self.batch_size]
+            for i in range(500):
                 print 'batch:', i
-                self.train(data[i * self.batch_size: (i+1) * self.batch_size],gan_label,gen_label)
+                for j in range(self.k):
+                    z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
+                    _, dis_loss = self.sess.run([self.opt_dis,self.loss], feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
+
+                z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
+                _, gen_loss = self.sess.run([self.opt_gen,self.loss], feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,) + self.image_size) , self.label : gen_label})
+                print dis_loss, gen_loss
+                if plot and i % 20 == 0:
+                    gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
+                    for im in range(5):
+                        img = Image.fromarray(((gimage[i]+1) / 2 * 255).astype(np.uint8), 'RGB')
+                        img.save('image/'+str(epoch)+'_'+str(i)+'_'+str(im)'.png')
             epoch += 1
             print 'epoch:',epoch
-            if plot and epoch % 5 == 0:
-                gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
-                for i in range(5):
-                    img = Image.fromarray(((gimage[i]+1) / 2 * 255).astype(np.uint8), 'RGB')
-                    img.save('image/'+str(epoch)+'_'+str(i)+'.png')
 
-    def train(self,sampledata,gan_label,gen_label):
-        for i in range(self.k):
-            z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-            _, dis_loss = self.sess.run([self.opt_dis,self.loss], feed_dict ={self.ginput: z, self.sampledata : sampledata, self.label : gan_label})
 
-        z = np.random.rand(self.batch_size,self.z_dim) * 2 - 1
-        _, gen_loss = self.sess.run([self.opt_gen,self.loss], feed_dict ={self.ginput: z, self.sampledata :np.zeros((0,) + self.image_size) , self.label : gen_label})
-        print dis_loss, gen_loss
 
     def gen_params(self):
         with tf.variable_scope('generator') as scope:
