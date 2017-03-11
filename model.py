@@ -43,7 +43,7 @@ class DCGan():
                 if plot and i % 20 == 0:
                     gimage = self.dconv4.eval(feed_dict = {self.ginput : np.random.rand(self.batch_size,self.z_dim)*2 - 1})
                     for im in range(5):
-                        img = Image.fromarray(((gimage[i]+1) / 2 * 255).astype(np.uint8), 'RGB')
+                        img = Image.fromarray(((gimage[im]+1) / 2 * 255).astype(np.uint8), 'RGB')
                         img.save('image/'+str(epoch)+'_'+str(i)+'_'+str(im)+ '.png')
             epoch += 1
             print 'epoch:',epoch
