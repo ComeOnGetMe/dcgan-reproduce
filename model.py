@@ -122,7 +122,7 @@ class DCGan():
             self.fcg = tf.nn.relu(tf.nn.bias_add(tf.matmul(self.ginput,self.fcg_w), self.fcg_b))
             self.fcgo = tf.reshape(self.fcg,[-1,4,4,1024])
             self.fcgm, self.fcgv = tf.nn.moments(self.fcgo, [0,1,2])
-            self.fcgb = tf.nn.batch_normalization(self.fcgo, self.fcgm, self.fcgv,self.fcg_sh,self.fcg_sc,self.eps)
+            self.fcgb = tf.nn.batch_normalization(self.fcgo, self.fcgm, self.fcgv,None, None,self.eps)
             # print self.dconv1_w.shape
 
         with tf.variable_scope('gen_dconv1') as scope:
@@ -132,7 +132,7 @@ class DCGan():
                                                               [1,2,2,1]),self.dconv1_b))
             self.dconv1m, self.dconv1v = tf.nn.moments(self.dconv1, [0,1,2])
             self.dconv1b = tf.nn.batch_normalization(self.dconv1, self.dconv1m, self.dconv1v,
-                                                     self.dconv1_sh,self.dconv1_sc,self.eps)
+                                                     None, None,self.eps)
 
         with tf.variable_scope('gen_dconv2') as scope:
             self.dconv2 = tf.nn.relu( tf.nn.bias_add(tf.nn.conv2d_transpose(self.dconv1b,
@@ -141,7 +141,7 @@ class DCGan():
                                                               [1,2,2,1]), self.dconv2_b))
             self.dconv2m, self.dconv2v = tf.nn.moments(self.dconv2, [0,1,2])
             self.dconv2b = tf.nn.batch_normalization(self.dconv2, self.dconv2m, self.dconv2v,
-                                                     self.dconv2_sh,self.dconv2_sc,self.eps)
+                                                     None, None,self.eps)
 
         with tf.variable_scope('gen_dconv3') as scope:
             self.dconv3 = tf.nn.relu( tf.nn.bias_add(tf.nn.conv2d_transpose(self.dconv2b,
@@ -150,7 +150,7 @@ class DCGan():
                                                               [1,2,2,1]), self.dconv3_b))
             self.dconv3m, self.dconv3v = tf.nn.moments(self.dconv3, [0,1,2])
             self.dconv3b = tf.nn.batch_normalization(self.dconv3, self.dconv3m, self.dconv3v,
-                                                     self.dconv3_sh,self.dconv3_sc,self.eps)
+                                                     None, None,self.eps)
 
         with tf.variable_scope('gen_dconv4') as scope:
             self.dconv4 = tf.nn.tanh(tf.nn.bias_add(tf.nn.conv2d_transpose(self.dconv3b,
@@ -168,28 +168,28 @@ class DCGan():
             self.conv1r = 0.2 * self.conv1 + (1 - 0.2) * tf.nn.relu(self.conv1)
             self.conv1m, self.conv1v = tf.nn.moments(self.conv1r, [0,1,2])
             self.conv1b = tf.nn.batch_normalization(self.conv1r, self.conv1m, self.conv1v,
-                                                    self.conv1_sh,self.conv1_sc, self.eps)
+                                                    None, None, self.eps
 
         with tf.variable_scope('dis_conv2') as scope:
             self.conv2 = tf.nn.bias_add(tf.nn.conv2d(self.conv1b, self.conv2_w, [1,2,2,1], 'SAME') , self.conv2_b)
             self.conv2r = 0.2 * self.conv2 + (1 - 0.2) * tf.nn.relu(self.conv2)
             self.conv2m, self.conv2v = tf.nn.moments(self.conv2r, [0,1,2])
             self.conv2b = tf.nn.batch_normalization(self.conv2r, self.conv2m, self.conv2v,
-                                                    self.conv2_sh,self.conv2_sc,self.eps)
+                                                    None, None,self.eps)
 
         with tf.variable_scope('dis_conv3') as scope:
             self.conv3 = tf.nn.bias_add(tf.nn.conv2d(self.conv2b, self.conv3_w, [1,2,2,1], 'SAME'), self.conv3_b)
             self.conv3r = 0.2 * self.conv3 + (1 - 0.2) * tf.nn.relu(self.conv3)
             self.conv3m, self.conv3v = tf.nn.moments(self.conv3r, [0,1,2])
             self.conv3b = tf.nn.batch_normalization(self.conv3r, self.conv3m, self.conv3v,
-                                                    self.conv3_sh,self.conv3_sc, self.eps)
+                                                    None, None, self.eps)
 
         with tf.variable_scope('dis_conv4') as scope:
             self.conv4 = tf.nn.bias_add(tf.nn.conv2d(self.conv3b, self.conv4_w, [1,2,2,1], 'SAME'), self.conv4_b)
             self.conv4r = 0.2 * self.conv4 + (1 - 0.2) * tf.nn.relu(self.conv4)
             self.conv4m, self.conv4v = tf.nn.moments(self.conv4r, [0,1,2])
             self.conv4b = tf.nn.batch_normalization(self.conv4r, self.conv4m, self.conv4v,
-                                                    self.conv4_sh,self.conv4_sc, self.eps)
+                                                    None, None, self.eps)
 
         with tf.variable_scope('dis_fc') as scope:
             self.fcd_in = tf.reshape(self.conv4b, [-1,4*4*512])
